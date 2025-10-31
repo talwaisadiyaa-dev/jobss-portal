@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Job Application</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f6f8;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(90deg, #0ea5e9, #2563eb);
+      color: #fff;
+      text-align: center;
+      padding: 18px;
+      font-size: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+    button {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0ea76b;
+    }
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .success {
+      color: #10b981;
+    }
+    .error {
+      color: #ef4444;
+    }
+    a.back {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #2563eb;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>Job Portal — Create Your Own Application</header>
+
+<div class="container">
+  <h2>Application Form</h2>
+  <form id="applicationForm">
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="email" id="email" placeholder="Email Address" required>
+    <input type="text" id="title" placeholder="Job Title You’re Applying For" required>
+    <input type="text" id="location" placeholder="Preferred Location" required>
+    <textarea id="cover" rows="4" placeholder="Write your cover letter..." required></textarea>
+    <button type="submit">Submit Application</button>
+  </form>
+  <div id="msg" class="message"></div>
+  <a href="index.html" class="back">← Back to Job Listings</a>
+</div>
+
+<script>
+document.getElementById('applicationForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const msg = document.getElementById('msg');
+  
+  // simulate a short delay like a real API call
+  msg.textContent = 'Submitting...';
+  msg.className = 'message';
+  
+  setTimeout(() => {
+    msg.textContent = '✅ Application submitted successfully!';
+    msg.className = 'message success';
+    document.getElementById('applicationForm').reset();
+  }, 800);
+});
+</script>
+
+</body>
+</html>

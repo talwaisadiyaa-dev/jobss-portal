@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Jobs Portal</title>
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --card: #fff;
+            --muted: #6b7280;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #10b981;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: #0f172a;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(90deg, #0ea5e9, #2563eb);
+            color: #fff;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Cards and Inputs */
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 1px 3px rgba(2,6,23,0.08);
+            border: 1px solid rgba(15,23,42,0.03);
+            animation: slideIn 0.3s ease-out;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(2,6,23,0.1);
+        }
+
+        input[type="text"], select {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #e6e9ef;
+            min-width: 160px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            background: var(--primary-dark);
+        }
+
+        .ghost {
+            background: transparent;
+            border: 1px solid #e6e9ef;
+            color: var(--muted);
+        }
+
+        /* Job List */
+        .job-list {
+            display: grid;
+            gap: 12px;
+            perspective: 1000px;
+        }
+
+        .job-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .job-row:nth-child(1) { animation-delay: 0.1s; }
+        .job-row:nth-child(2) { animation-delay: 0.2s; }
+        .job-row:nth-child(3) { animation-delay: 0.3s; }
+        .job-row:nth-child(4) { animation-delay: 0.4s; }
+        .job-row:nth-child(5) { animation-delay: 0.5s; }
+
+        .job-info { flex: 1; }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 60;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal {
+            background: var(--card);
+            width: 100%;
+            max-width: 700px;
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 12px 40px rgba(2,6,23,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Utility Classes */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            animation: pulse 1.5s infinite;
+        }
+
+        .error {
+            color: #ef4444;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 6px;
+            background: #fef2f2;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @media(max-width: 880px) {
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Job Portal</h1>
+        <div class="small">Browse jobs · Filter · Apply</div>
+        <a href="user-apply.html" class="btn" style="background:#10b981;margin-top:10px;">get started</a>
+    </header>
+
+    <main class="container">
+        <div class="controls">
+            <input type="text" id="search" placeholder="Search jobs...">
+            <input type="text" id="location" placeholder="Location">
+            <select id="type">
+                <option value="">All Types</option>
+            </select>
+            <select id="sort">
+                <option value="newest">Newest First</option>
+            </select>
+            <button id="clear" class="btn ghost">Clear Filters</button>
+        </div>
+
+        <section class="job-list">
+            <!-- Jobs will be rendered here -->
+        </section>
+    </main>
+
+    <div id="modalBackdrop" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Apply for Position</h2>
+                <button onclick="closeModal()" class="btn ghost">✕</button>
+            </div>
+            <form id="applicationForm" onsubmit="submitApplication(event)">
+                <div class="form-row">
+                    <input type="text" required placeholder="Full Name">
+                    <input type="email" required placeholder="Email">
+                </div>
+                <div class="form-row">
+                    <textarea required placeholder="Cover Letter" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn">Submit Application</button>
+            </form>
+        </div>
+    </div>
+<script>
+/* Part 1 — Config & Mock */
+const API_CONFIG = {
+  key: '6904da8d6b8dabde4965612a',               
+  baseUrl: 'https://6904da8d6b8dabde4965612a.mockapi.io/Jobs/:endpoint',    
+  headers: { 'Content-Type': 'application/json' }
+};
+
+const MOCK_JOBS = [
+  { id: 1, title: "Frontend Developer", company: "TechCorp", location: "Remote", type: "Full-time", salary: 85000, date: "2025-10-01", desc: "Build UIs." },
+  { id: 2, title: "Backend Engineer", company: "DataWorks", location: "NYC", type: "Full-time", salary: 95000, date: "2025-09-20", desc: "APIs & DB." },
+  { id: 3, title: "QA Tester", company: "QualityHub", location: "Austin", type: "Part-time", salary: 48000, date: "2025-08-15", desc: "Test automation." }
+];
+
+/* Part 2 — State & Utilities */
+const state = { jobs: [], loading: false, error: null, filters: { search: '', location: '', type: '', sort: 'newest' } };
+const els = {
+  search: document.querySelector('#search'),
+  location: document.querySelector('#location'),
+  type: document.querySelector('#type'),
+  sort: document.querySelector('#sort'),
+  clear: document.querySelector('#clear'),
+  jobList: document.querySelector('.job-list'),
+  modalBackdrop: document.querySelector('#modalBackdrop'),
+  form: document.querySelector('#applicationForm')
+};
+
+const FAV_KEY = 'jobPortalFavorites';
+const favorites = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+function saveFavs(){ localStorage.setItem(FAV_KEY, JSON.stringify([...favorites])); }
+function isFav(id){ return favorites.has(String(id)); }
+function toggleFav(id){ const s=String(id); isFav(id)?favorites.delete(s):favorites.add(s); saveFavs(); renderJobs(currentViewJobs()); updateFavBtn(); }
+
+function fmtCurrency(n){ return '$' + (n||0).toLocaleString(); }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,(m)=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])); }
+
+/* Part 3 — Fetch & Filtering */
+async function fetchJobsFromApi(){
+  if(!API_CONFIG.key || API_CONFIG.key==='YOUR_API_KEY_HERE') return new Promise(r=>setTimeout(()=>r(MOCK_JOBS),200));
+  try{
+    const res = await fetch(API_CONFIG.baseUrl + '/jobs', { headers: { ...API_CONFIG.headers, Authorization: 'Bearer '+API_CONFIG.key } });
+    if(!res.ok) throw new Error(res.status);
+    return await res.json();
+  }catch(e){ console.warn('API fetch failed, using mock', e); return MOCK_JOBS; }
+}
+
+function applyFilters(list){
+  let out = list.slice();
+  const f = state.filters;
+  if(f.search) out = out.filter(j=> (j.title+ ' '+ j.company + ' ' + (j.desc||'')).toLowerCase().includes(f.search.toLowerCase()));
+  if(f.location) out = out.filter(j=> j.location.toLowerCase().includes(f.location.toLowerCase()));
+  if(f.type) out = out.filter(j=> j.type === f.type);
+  if(f.sort==='salary') out.sort((a,b)=>b.salary - a.salary);
+  else out.sort((a,b)=> new Date(b.date) - new Date(a.date));
+  return out;
+}
+
+function currentViewJobs(){ return applyFilters(state.jobs); }
+
+/* Part 4 — Render & Modal */
+function renderJobs(jobs){
+  if(state.loading){ els.jobList.innerHTML = '<div class="loading">Loading jobs...</div>'; return; }
+  if(state.error){ els.jobList.innerHTML = `<div class="error">${escapeHtml(state.error)}</div>`; return; }
+  if(!jobs.length){ els.jobList.innerHTML = '<div class="card">No jobs found</div>'; return; }
+  els.jobList.innerHTML = jobs.map(j=>`
+    <div class="card job-row">
+      <div class="job-info">
+        <h3>${escapeHtml(j.title)}</h3>
+        <div class="meta">${escapeHtml(j.company)} · ${escapeHtml(j.location)} · ${escapeHtml(j.type)}</div>
+        <div class="meta">${fmtCurrency(j.salary)} · Posted ${new Date(j.date).toLocaleDateString()}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn ghost" onclick="toggleFav(${j.id})">${ isFav(j.id) ? '★' : '☆' }</button>
+        <button class="btn" onclick="openModal(${j.id})">Apply Now</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id){
+  const job = state.jobs.find(x=>String(x.id)===String(id)) || MOCK_JOBS.find(x=>String(x.id)===String(id));
+  if(!job) return;
+  const modal = els.modalBackdrop;
+  modal.querySelector('h2').textContent = `Apply: ${job.title} — ${job.company}`;
+  const ta = modal.querySelector('textarea'); const name = modal.querySelector('input[type="text"]'); const email = modal.querySelector('input[type="email"]');
+  if(ta) ta.value = ''; if(name) name.value=''; if(email) email.value='';
+  modal.style.display = 'flex';
+}
+
+function closeModal(){ els.modalBackdrop.style.display = 'none'; }
+
+function submitApplication(e){
+  e.preventDefault();
+  closeModal();
+  // mimic submit
+  const el = document.createElement('div'); el.className='card'; el.textContent='Application submitted — thank you.'; els.jobList.prepend(el);
+  setTimeout(()=> el.remove(), 3500);
+}
+
+/* Part 5 — Events, helpers & Init */
+async function update(){
+  state.loading = true; state.error = null; renderJobs([]);
+  try{ state.jobs = await fetchJobsFromApi(); } catch(e){ state.error = 'Failed to load jobs'; state.jobs = []; }
+  state.loading = false; renderJobs(currentViewJobs()); updateFavBtn();
+}
+
+function updateFavBtn(){
+  const btn = document.querySelector('#showFavoritesBtn');
+  if(btn) btn.textContent = `★ Favorites ${favorites.size? '('+favorites.size+')':''}`;
+}
+
+els.search.addEventListener('input', (e)=>{ state.filters.search = e.target.value; renderJobs(currentViewJobs()); });
+els.location.addEventListener('input', (e)=>{ state.filters.location = e.target.value; renderJobs(currentViewJobs()); });
+els.type.addEventListener('change', (e)=>{ state.filters.type = e.target.value; renderJobs(currentViewJobs()); });
+els.sort.addEventListener('change', (e)=>{ state.filters.sort = e.target.value; renderJobs(currentViewJobs()); });
+els.clear.addEventListener('click', ()=>{ els.search.value=''; els.location.value=''; els.type.value=''; els.sort.value='newest'; state.filters={search:'',location:'',type:'',sort:'newest'}; renderJobs(currentViewJobs()); });
+
+document.addEventListener('click', (ev)=>{
+  if(ev.target.matches('#showFavoritesBtn')) {
+    const list = Array.from(favorites).map(id => state.jobs.find(j=>String(j.id)===String(id))).filter(Boolean);
+    renderJobs(list);
+  }
+  if(ev.target.closest('.modal-backdrop') && ev.target === els.modalBackdrop) closeModal();
+});
+
+// bind form submit (form in modal)
+if(els.form) els.form.addEventListener('submit', submitApplication);
+
+// populate type options
+['','Full-time','Part-time','Contract'].forEach(v=>{
+  const opt = document.createElement('option'); opt.value=v; opt.textContent = v||'All Types'; els.type.appendChild(opt);
+});
+
+// inject header favorites button if missing
+if(!document.querySelector('#showFavoritesBtn')){
+  const btn = document.createElement('button'); btn.id='showFavoritesBtn'; btn.className='btn ghost'; btn.style.marginLeft='12px';
+  btn.textContent = `★ Favorites ${favorites.size? '('+favorites.size+')':''}`;
+  document.querySelector('header').insertBefore(btn, document.querySelector('header').children[1] || null);
+}
+update();
+updateFavBtn();
+</script>
+</body>
+</html>
